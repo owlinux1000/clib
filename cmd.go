@@ -3,16 +3,29 @@ package clib
 type Command struct {
     Name string
     ShortName string
-    ArgCount int
-    Help string
-    Flag bool
+    Synopsis string
     ArgName string
-    Args []string
+    ArgCount int
+    SetFlag bool
+    args []string
+}
+
+func (c Command) GetArgs() []string {
+    return c.args
+}
+
+func NewCommand(name, shortName, synopsis string, argCount int) *Command {
+    return &Command{
+        Name: name,
+        ShortName: shortName,
+        Synopsis: synopsis,
+        ArgCount: argCount,
+    }
 }
 
 func (c *Command) Parse(args []string, i *uint) int {
     
-    c.Flag = true
+    c.SetFlag = true
     
     if c.ArgCount == 0 {
         return 0
@@ -23,10 +36,13 @@ func (c *Command) Parse(args []string, i *uint) int {
     }
     
     for _i := 1; _i < c.ArgCount + 1; _i++ {
-        c.Args = append(c.Args, args[_i])
+        c.args = append(c.args, args[_i])
         *i++
     }
-    
-    return 0
-    
+
+    if len(c.args) != c.ArgCount {
+        return 1
+    } else {
+        return 0
+    }
 }

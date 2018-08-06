@@ -5,13 +5,7 @@ import "testing"
 func TestAppParseWithNoArgCommand(t *testing.T) {
 
     app := NewApp("testapp", "1.0.0")
-    app.AddCommand(Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 0,
-        Help: "Install Command",
-    })
-
+    app.AddCommand("install", "i", "Install command", 0)
     args := []string{
         "testapp",
         "install",
@@ -29,25 +23,13 @@ func TestAppParseWithNoArgCommand(t *testing.T) {
     if app.Args[0] != expectedArg {
         t.Errorf("got: %v\nwant: %v", app.Args[0], expectedArg)
     }
-
-    flagCmds := app.FlagCommands()
-    if !flagCmds["install"] || !flagCmds["i"]{
-        t.Errorf("got: true\nwant: %v", flagCmds["install"])
-    }
-    
 }
 
 func TestAppParseWithOneArgCommand(t *testing.T) {
 
     app := NewApp("testapp", "1.0.0")
-    app.AddCommand(Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 1,
-        Help: "Install Command",
-    })
-
-    args := []string{
+    app.AddCommand("install", "i", "Install command", 1)
+    args := []string{    
         "testapp",
         "install",
         "hoge",
@@ -61,27 +43,16 @@ func TestAppParseWithOneArgCommand(t *testing.T) {
     }
 
     expectedArg := "hoge"
-    if app.Commands[0].Args[0] != expectedArg {
-        t.Errorf("got: %v\nwant: %v", app.Commands[0].Args[0], expectedArg)
+    actualArg := app.GetCommandArgs("install")[0]
+    if actualArg != expectedArg {
+        t.Errorf("got: %v\nwant: %v", actualArg, expectedArg)
     }
-
-    flagCmds := app.FlagCommands()
-    if !flagCmds["install"] || !flagCmds["i"]{
-        t.Errorf("got: true\nwant: %v", flagCmds["install"])
-    }
-    
 }
 
 func TestAppParseOneCommandOneOption(t *testing.T) {
 
     app := NewApp("testapp", "1.0.0")
-    
-    app.AddCommand(Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 2,
-        Help: "Install Command",
-    })
+    app.AddCommand("install", "i", "Install command", 2)
     
     app.AddOption(Option{
         Name: "a",
@@ -105,30 +76,18 @@ func TestAppParseOneCommandOneOption(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
 
-    expectedArg := "hoge"
-    if app.Commands[0].Args[0] != expectedArg {
-        t.Errorf("got: %v\nwant: %v", app.Commands[0].Args[0], expectedArg)
-    }
+    expectedCommandArgs := []string{"hoge", "fuga"}
+    actualCommandArgs := app.GetCommandArgs("install")
 
-    expectedArg = "fuga"
-    if app.Commands[0].Args[1] != expectedArg {
-        t.Errorf("got: %v\nwant: %v", app.Commands[0].Args[1], expectedArg)
+    for i, _ := range expectedCommandArgs {
+        if actualCommandArgs[i] != expectedCommandArgs[i] {
+            t.Errorf("got: %v\nwant: %v", actualCommandArgs[i], expectedCommandArgs[i])
+        }
     }
     
-    expectedArg = "huge"
+    expectedArg := "huge"
     if app.Options[2].Args[0] != expectedArg {
         t.Errorf("got: %v\nwant: %v", app.Options[2].Args[0], expectedArg)
     }
-
-    flagCmds := app.FlagCommands()
-    if !flagCmds["install"] || !flagCmds["i"]{
-        t.Errorf("got: true\nwant: %v", flagCmds["install"])
-    }
-
-    optsCmds := app.FlagOptions()
-    if !optsCmds["a"] {
-        t.Errorf("got: true\nwant: %v", optsCmds["a"])
-    }
-    
 }
 

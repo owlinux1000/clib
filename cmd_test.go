@@ -1,15 +1,12 @@
 package clib
 
-import "testing"
+import (
+    "testing"
+)
 
 func TestParseNoArgCommand(t *testing.T) {
     
-    cmd := Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 0,
-        Help: "Install Command",
-    }
+    cmd := NewCommand("install", "i", "Install command", 0)
     
     var i uint = 0
     args := []string{
@@ -23,12 +20,12 @@ func TestParseNoArgCommand(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, 0)
     }
 
-    if len(cmd.Args) != 0 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.Args), 0)
+    if len(cmd.GetArgs()) != 0 {
+        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 0)
     }
 
     if i != 0 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.Args), 0)
+        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 0)
     }
     
 }
@@ -39,7 +36,7 @@ func TestParseOneArgCommand(t *testing.T) {
         Name: "install",
         ShortName: "i",
         ArgCount: 1,
-        Help: "Install Command",
+        Synopsis: "Install Command",
     }
     
     var i uint = 0
@@ -54,12 +51,12 @@ func TestParseOneArgCommand(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, 0)
     }
     
-    if len(cmd.Args) != 1 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.Args), 1)
+    if len(cmd.GetArgs()) != 1 {
+        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 1)
     }
     
-    if cmd.Args[0] != "hoge" {
-        t.Errorf("got: %v\nwant: %v", cmd.Args, []string{"hoge"})
+    if cmd.GetArgs()[0] != "hoge" {
+        t.Errorf("got: %v\nwant: %v", cmd.GetArgs(), []string{"hoge"})
     }
     
     if i != 1 {
@@ -74,7 +71,7 @@ func TestParseOneArgCommand2(t *testing.T) {
         Name: "install",
         ShortName: "i",
         ArgCount: 1,
-        Help: "Install Command",
+        Synopsis: "Install Command",
     }
     
     var i uint = 0
@@ -96,7 +93,7 @@ func TestParseTwoArgCommand(t *testing.T) {
         Name: "install",
         ShortName: "i",
         ArgCount: 2,
-        Help: "Install Command",
+        Synopsis: "Install Command",
     }
     
     var i uint = 0
@@ -112,12 +109,12 @@ func TestParseTwoArgCommand(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, 0)
     }
     
-    if cmd.Args[0] != "hoge" || cmd.Args[1] != "fuga" {
-        t.Errorf("got: %v\nwant: %v", cmd.Args, []string{"hoge", "fuga"})
+    if cmd.GetArgs()[0] != "hoge" || cmd.GetArgs()[1] != "fuga" {
+        t.Errorf("got: %v\nwant: %v", cmd.GetArgs(), []string{"hoge", "fuga"})
     }
     
-    if len(cmd.Args) != 2 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.Args), 2)
+    if len(cmd.GetArgs()) != 2 {
+        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 2)
     }
 
     if i != 2 {
