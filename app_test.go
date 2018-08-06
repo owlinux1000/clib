@@ -4,7 +4,7 @@ import "testing"
 
 func TestAppParseWithNoArgCommand(t *testing.T) {
 
-    app := NewApp("testapp", "1.0.0")
+    app, _ := NewApp("testapp", "1.0.0")
     app.AddCommand("install", "i", "Install command", 0)
     args := []string{
         "testapp",
@@ -12,7 +12,7 @@ func TestAppParseWithNoArgCommand(t *testing.T) {
         "hoge",
     }
     
-    actual := app.Parse(args[1:])
+    actual, _ := app.Parse(args[1:])
     expected := 0
     
     if actual != expected {
@@ -23,11 +23,12 @@ func TestAppParseWithNoArgCommand(t *testing.T) {
     if app.Args[0] != expectedArg {
         t.Errorf("got: %v\nwant: %v", app.Args[0], expectedArg)
     }
+    
 }
 
 func TestAppParseWithOneArgCommand(t *testing.T) {
 
-    app := NewApp("testapp", "1.0.0")
+    app, _ := NewApp("testapp", "1.0.0")
     app.AddCommand("install", "i", "Install command", 1)
     args := []string{    
         "testapp",
@@ -35,7 +36,7 @@ func TestAppParseWithOneArgCommand(t *testing.T) {
         "hoge",
     }
     
-    actual := app.Parse(args[1:])
+    actual, _ := app.Parse(args[1:])
     expected := 0
     
     if actual != expected {
@@ -47,19 +48,15 @@ func TestAppParseWithOneArgCommand(t *testing.T) {
     if actualArg != expectedArg {
         t.Errorf("got: %v\nwant: %v", actualArg, expectedArg)
     }
+    
 }
 
 func TestAppParseOneCommandOneOption(t *testing.T) {
 
-    app := NewApp("testapp", "1.0.0")
+    app, _ := NewApp("testapp", "1.0.0")
     app.AddCommand("install", "i", "Install command", 2)
+    app.AddOption("a", "a option", 1)
     
-    app.AddOption(Option{
-        Name: "a",
-        ArgCount: 1,
-        Help: "a option",
-    })
-
     args := []string{
         "testapp",
         "install",
@@ -69,7 +66,7 @@ func TestAppParseOneCommandOneOption(t *testing.T) {
         "huge",
     }
     
-    actual := app.Parse(args[1:])
+    actual, _ := app.Parse(args[1:])
     expected := 0
     
     if actual != expected {
@@ -86,8 +83,10 @@ func TestAppParseOneCommandOneOption(t *testing.T) {
     }
     
     expectedArg := "huge"
-    if app.Options[2].Args[0] != expectedArg {
-        t.Errorf("got: %v\nwant: %v", app.Options[2].Args[0], expectedArg)
+    actualArgs := app.GetOptionArgs("a")
+    if actualArgs[0] != expectedArg {
+        t.Errorf("got: %v\nwant: %v", actualArgs[0], expectedArg)
     }
+    
 }
 

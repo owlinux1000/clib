@@ -4,26 +4,22 @@ import "testing"
 
 func TestParseNoArgOption(t *testing.T) {
     
-    opt := Option{
-        Name: "a",
-        ArgCount: 0,
-        Help: "a option",
-    }
+    opt, _ := NewOption("a", "a option", 0)
     
     var i uint = 0
     args := []string{
         "-a",
         "hoge",
     }
-    
-    actual := opt.Parse(args, &i)
 
-    if actual != 0 {
-        t.Errorf("got: %v\nwant: %v", actual, 0)
+    expected := 0
+    actual, _ := opt.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
-
-    if len(opt.Args) != 0 {
-        t.Errorf("got: %v\nwant: %v", len(opt.Args), 0)
+    
+    if len(opt.GetArgs()) != 0 {
+        t.Errorf("got: %v\nwant: %v", len(opt.GetArgs()), 0)
     }
 
     if i != 0 {
@@ -33,27 +29,23 @@ func TestParseNoArgOption(t *testing.T) {
 }
 
 func TestParseOneArgOption(t *testing.T) {
-    
-    opt := Option{
-        Name: "a",
-        ArgCount: 1,
-        Help: "a option",
-    }
+
+    opt, _ := NewOption("a", "a option", 1)
     
     var i uint = 0
     args := []string{
         "-a",
         "hoge",
     }
-    
-    actual := opt.Parse(args, &i)
 
-    if actual != 0 {
-        t.Errorf("got: %v\nwant: %v", actual, 0)
+    expected := 0
+    actual, _ := opt.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
-
-    if len(opt.Args) != 1 {
-        t.Errorf("got: %v\nwant: %v", len(opt.Args), 1)
+    
+    if len(opt.GetArgs()) != 1 {
+        t.Errorf("got: %v\nwant: %v", len(opt.GetArgs()), 1)
     }
 
     if i != 1 {
@@ -64,33 +56,24 @@ func TestParseOneArgOption(t *testing.T) {
 
 func TestParseOneArgOption2(t *testing.T) {
     
-    opt := Option{
-        Name: "a",
-        ArgCount: 1,
-        Help: "a option",
-    }
+    opt, _ := NewOption("a", "a option", 1)
     
     var i uint = 0
-
     args := []string{
         "-a", 
     }
     
     // args doesn't have argument of a option. So, opt.Parse returns 1
-    actual := opt.Parse(args, &i)
-    if actual != 1 {
-        t.Errorf("got: %v\nwant: %v", actual, 1)
+    expected := 1
+    actual, _ := opt.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
-    
 }
 
 func TestParseTwoArgOption(t *testing.T) {
-    
-    opt := Option{
-        Name: "a",
-        ArgCount: 2,
-        Help: "a option",
-    }
+
+    opt, _ := NewOption("a", "a option", 2)
     
     var i uint = 0
     args := []string{
@@ -98,15 +81,15 @@ func TestParseTwoArgOption(t *testing.T) {
         "hoge",
         "fuga",
     }
-    
-    actual := opt.Parse(args, &i)
-    
-    if actual != 0 {
-        t.Errorf("got: %v\nwant: %v", actual, 0)
-    }
 
-    if len(opt.Args) != 2 {
-        t.Errorf("got: %v\nwant: %v", len(opt.Args), 2)
+    expected := 0
+    actual, _ := opt.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
+    }
+    
+    if len(opt.GetArgs()) != 2 {
+        t.Errorf("got: %v\nwant: %v", len(opt.GetArgs()), 2)
     }
 
     if i != 2 {

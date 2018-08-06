@@ -3,6 +3,7 @@ package clib
 import (
     "fmt"
     "strings"
+    "errors"
 )
 
 // App is a main struct of clib package.
@@ -16,24 +17,28 @@ type App struct {
     // all Commands
     Commands map[string]*Command
     // all Options
-    Options []Option
+    Options map[string]*Option
 }
 
-func NewApp(name, version string) *App {
+func NewApp(name, version string) (*App, error) {
+    
     app := &App {
         Name: name,
         Version: version,
         Commands: map[string]*Command{},
+        Options: map[string]*Option{},
     }
-    app.AddOption(Option{
-        Name: "h",
-        Help: "Display the usage message",
-    })
-    app.AddOption(Option{
-        Name: "v",
-        Help: "Display the my version",
-    })
-    return app
+    
+    if err := app.AddOption("h", "Display the usage message", 0); err != nil {
+        return nil, err
+    }
+    
+    if err := app.AddOption("v", "Display the my version", 0); err != nil {
+        return nil, err
+    }
+    
+    return app, nil
+    
 }
 
 func (a App) GetCommandArgs(name string) []string {
@@ -43,14 +48,28 @@ func (a App) GetCommandArgs(name string) []string {
     return []string{}
 }
 
-// AddOption is a function to add given option to App
-func (a *App) AddOption(option Option) bool {
-    if a.hasOption(option.Name) {
-        fmt.Printf("-%s option duplicated.\n", option.Name)
-        return false
+func (a App) GetOptionArgs(name string) []string {
+    if a.Options[name] != nil {
+        return a.Options[name].GetArgs()
     }
-    a.Options = append(a.Options, option)
-    return true
+    return []string{}
+}
+
+// AddOption is a function to add given option to App
+func (a *App) AddOption(name, synopsis string, argCount int) error {
+    
+    if a.Options[name] != nil {
+        return errors.New(fmt.Sprintf("-%s option duplicated.\n", name))
+    }
+    
+    opt, err := NewOption(name, synopsis, argCount)
+    if err != nil {
+        return err
+    }
+    
+    a.Options[name] = opt
+    return nil
+    
 }
 
 // AddCommand is a function to add given command to App
@@ -61,14 +80,6 @@ func (a *App) AddCommand(name, shortName, synopsis string, argCount int) bool {
     }
     a.Commands[name] = NewCommand(name, shortName, synopsis, argCount)
     return true
-}
-
-func (a App) FlagOptions() map[string]bool {
-    m := map[string]bool{}
-    for _, v := range a.Options {
-        m[v.Name] = v.Flag
-    }
-    return m
 }
 
 // Help is a function to display help message
@@ -102,7 +113,7 @@ func (a App) Help() {
         } else {
             fmt.Printf("\t\t")
         }
-        fmt.Printf("%s\n", o.Help)
+        fmt.Printf("%s\n", o.Synopsis)
     }
 
     if len(a.Commands) != 0 {
@@ -142,38 +153,45 @@ func (a App) hasCommandArg() bool {
 }
 
 // Parse is a function to parse the argument
-func (a *App) Parse(args []string) int {
+func (a *App) Parse(args []string) (int, error){
     
     args_len := uint(len(args))
     
     if args_len == 0 {
         a.Help()
-        return 0
+        return 0, nil
     }
 
     if args[0] == "-h" {
         a.Help()
-        return 0
+        return 0, nil
     }
 
     if args[0] == "-v" {
         fmt.Printf("%s %s\n", a.Name, a.Version)
-        return 0
+        return 0, nil
     }
     
     var i uint
     for i = 0; i < args_len; i++ {
+        
         if strings.HasPrefix(args[i], "-") {
+            
+            if len(args[i]) != 2 {
+                return 1, errors.New(
+                    fmt.Sprintf("Invalid option format: %v", args[i]),
+                )
+            }
+            
             o := string(args[i][1])
-            if a.hasOption(o) {
-                o_i := a.indexOfOption(o)
-                if exitStatus := a.Options[o_i].Parse(args[i:], &i); exitStatus != 0 {
-                    return exitStatus
+            if a.Options[o] != nil {
+                if s, err := a.Options[o].Parse(args[i:], &i); err != nil {
+                    return s, err
                 }
             }
         } else if a.Commands[args[i]] != nil {
             if exitStatus := a.Commands[args[i]].Parse(args[i:], &i); exitStatus != 0 {
-                return exitStatus
+                return exitStatus, nil
             }
         } else {
             a.Args = append(a.Args, args[i])
@@ -181,7 +199,7 @@ func (a *App) Parse(args []string) int {
         
     }
     
-    return 0
+    return 0, nil
 }
 
 // hasComand is a function to exist the Option
@@ -227,14 +245,4 @@ func (a App) indexOfComand(s string) (uint) {
         i += 1
     }
     return i
-}
-
-// 
-func (a App) OptionArgs(s string) ([]string, bool) {
-    for _, o := range a.Options {
-        if o.Name == s {
-            return o.Args, o.Flag
-        }
-    }
-    return []string{}, false
 }
