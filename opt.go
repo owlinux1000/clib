@@ -14,21 +14,22 @@ func (o *Option) Parse(args []string, i *uint) int {
     o.Flag = true
     
     if o.ArgCount == 0 {
-        *i -= 1
         return 0
     }
     
-    if o.ArgCount > len(args) {
+    if o.ArgCount > len(args) - 1 {
         return 1
     }
-    
-    for _i := 0; _i < o.ArgCount; _i++ {
+
+    for _i := 1; _i < o.ArgCount + 1; _i++ {
         o.Args = append(o.Args, args[_i])
-        if o.ArgCount != 1 {
-            *i += 1
-        }
+        *i++
     }
-    
-    return 0
+
+    if len(o.Args) != o.ArgCount {
+        return 1
+    } else {
+        return 0        
+    }
     
 }

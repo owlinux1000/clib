@@ -35,6 +35,7 @@ func NewApp(name, version string) *App {
     return app
 }
 
+// AddOption is a function to add given option to App
 func (a *App) AddOption(option Option) bool {
     if a.hasOption(option.Name) {
         fmt.Printf("-%s option duplicated.\n", option.Name)
@@ -44,6 +45,7 @@ func (a *App) AddOption(option Option) bool {
     return true
 }
 
+// AddCommand is a function to add given command to App
 func (a *App) AddCommand(command Command) bool {
     if a.hasCommand(command.Name) {
         fmt.Printf("%s command duplicated.\n", command.Name)
@@ -70,6 +72,7 @@ func (a App) FlagCommands() map[string]bool {
     return m
 }
 
+// Help is a function to display help message
 func (a App) Help() {
     fmt.Printf("Usage: \n\t")
     fmt.Printf("%s", a.Name)
@@ -165,14 +168,12 @@ func (a *App) Parse(args []string) int {
             o := string(args[i][1])
             if a.hasOption(o) {
                 o_i := a.indexOfOption(o)
-                i += 1
                 if exitStatus := a.Options[o_i].Parse(args[i:], &i); exitStatus != 0 {
                     return exitStatus
                 }
             }
         } else if a.hasCommand(args[i]) {
             c_i := a.indexOfComand(args[i]);
-            i += 1
             if exitStatus := a.Commands[c_i].Parse(args[i:], &i); exitStatus != 0 {
                 return exitStatus
             }
@@ -230,6 +231,7 @@ func (a App) indexOfComand(s string) (uint) {
     return i
 }
 
+// 
 func (a App) OptionArgs(s string) ([]string, bool) {
     for _, o := range a.Options {
         if o.Name == s {
@@ -247,5 +249,3 @@ func (a App) CommandArgs(s string) ([]string, bool) {
     }
     return []string{}, false
 }
-
-
