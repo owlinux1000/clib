@@ -14,7 +14,7 @@ type App struct {
     // Argument
     Args []string
     // all Commands
-    Commands []Command
+    Commands map[string]*Command
     // all Options
     Options []Option
 }
@@ -23,6 +23,7 @@ func NewApp(name, version string) *App {
     app := &App {
         Name: name,
         Version: version,
+        Commands: map[string]*Command{},
     }
     app.AddOption(Option{
         Name: "h",
@@ -33,6 +34,13 @@ func NewApp(name, version string) *App {
         Help: "Display the my version",
     })
     return app
+}
+
+func (a App) GetCommandArgs(name string) []string {
+    if a.Commands[name] != nil {
+        return a.Commands[name].GetArgs()
+    }
+    return []string{}
 }
 
 // AddOption is a function to add given option to App
@@ -46,12 +54,12 @@ func (a *App) AddOption(option Option) bool {
 }
 
 // AddCommand is a function to add given command to App
-func (a *App) AddCommand(command Command) bool {
-    if a.hasCommand(command.Name) {
-        fmt.Printf("%s command duplicated.\n", command.Name)
+func (a *App) AddCommand(name, shortName, synopsis string, argCount int) bool {
+    if a.Commands[name] != nil {
+        fmt.Printf("%s command is duplicated.\n", name)
         return false
     }
-    a.Commands = append(a.Commands, command)
+    a.Commands[name] = NewCommand(name, shortName, synopsis, argCount)
     return true
 }
 
@@ -59,15 +67,6 @@ func (a App) FlagOptions() map[string]bool {
     m := map[string]bool{}
     for _, v := range a.Options {
         m[v.Name] = v.Flag
-    }
-    return m
-}
-
-func (a App) FlagCommands() map[string]bool {
-    m := map[string]bool{}
-    for _, v := range a.Commands {
-        m[v.Name] = v.Flag
-        m[v.ShortName] = v.Flag
     }
     return m
 }
@@ -119,7 +118,7 @@ func (a App) Help() {
         } else {
             fmt.Printf("\t")
         }
-        fmt.Printf("%s\n", c.Help)
+        fmt.Printf("%s\n", c.Synopsis)
     }
 }
 
@@ -172,9 +171,8 @@ func (a *App) Parse(args []string) int {
                     return exitStatus
                 }
             }
-        } else if a.hasCommand(args[i]) {
-            c_i := a.indexOfComand(args[i]);
-            if exitStatus := a.Commands[c_i].Parse(args[i:], &i); exitStatus != 0 {
+        } else if a.Commands[args[i]] != nil {
+            if exitStatus := a.Commands[args[i]].Parse(args[i:], &i); exitStatus != 0 {
                 return exitStatus
             }
         } else {
@@ -236,15 +234,6 @@ func (a App) OptionArgs(s string) ([]string, bool) {
     for _, o := range a.Options {
         if o.Name == s {
             return o.Args, o.Flag
-        }
-    }
-    return []string{}, false
-}
-
-func (a App) CommandArgs(s string) ([]string, bool) {
-    for _, c := range a.Commands {
-        if c.Name == s || c.ShortName == s {
-            return c.Args, c.Flag
         }
     }
     return []string{}, false
