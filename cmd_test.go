@@ -6,18 +6,18 @@ import (
 
 func TestParseNoArgCommand(t *testing.T) {
     
-    cmd := NewCommand("install", "i", "Install command", 0)
+    cmd, _ := NewCommand("install", "i", "Install command", 0)
     
     var i uint = 0
     args := []string{
         "install",
         "hoge",
     }
-    
-    actual := cmd.Parse(args, &i)
-    
-    if actual != 0 {
-        t.Errorf("got: %v\nwant: %v", actual, 0)
+
+    expected := 0
+    actual, _ := cmd.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
 
     if len(cmd.GetArgs()) != 0 {
@@ -31,24 +31,20 @@ func TestParseNoArgCommand(t *testing.T) {
 }
 
 func TestParseOneArgCommand(t *testing.T) {
-    
-    cmd := Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 1,
-        Synopsis: "Install Command",
-    }
-    
+
+    cmd, _ := NewCommand("install", "i", "Install command", 1)
+
     var i uint = 0
     args := []string{
         "install",
         "hoge",
         "fuga",
     }
-    
-    actual := cmd.Parse(args, &i)
-    if actual != 0 {
-        t.Errorf("got: %v\nwant: %v", actual, 0)
+
+    expected := 0
+    actual, _ := cmd.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
     if len(cmd.GetArgs()) != 1 {
@@ -66,13 +62,8 @@ func TestParseOneArgCommand(t *testing.T) {
 }
 
 func TestParseOneArgCommand2(t *testing.T) {
-    
-    cmd := Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 1,
-        Synopsis: "Install Command",
-    }
+
+    cmd, _ := NewCommand("install", "i", "Install command", 1)
     
     var i uint = 0
     args := []string{
@@ -80,21 +71,17 @@ func TestParseOneArgCommand2(t *testing.T) {
     }
 
     // args doesn't have argument of install command. So, cmd.Parse returns 1
-    actual := cmd.Parse(args, &i)
-    if actual != 1 {
-        t.Errorf("got: %v\nwant: %v", actual, 1)
+    expected := 1
+    actual, _ := cmd.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
 }
 
 func TestParseTwoArgCommand(t *testing.T) {
     
-    cmd := Command{
-        Name: "install",
-        ShortName: "i",
-        ArgCount: 2,
-        Synopsis: "Install Command",
-    }
+    cmd, _ := NewCommand("install", "i", "Install command", 2)
     
     var i uint = 0
     args := []string{
@@ -102,11 +89,11 @@ func TestParseTwoArgCommand(t *testing.T) {
         "hoge",
         "fuga",
     }
-    
-    actual := cmd.Parse(args, &i)
-    
-    if actual != 0 {
-        t.Errorf("got: %v\nwant: %v", actual, 0)
+
+    expected := 0
+    actual, _ := cmd.Parse(args, &i)
+    if actual != expected {
+        t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
     if cmd.GetArgs()[0] != "hoge" || cmd.GetArgs()[1] != "fuga" {

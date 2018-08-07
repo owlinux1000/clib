@@ -20,6 +20,7 @@ type App struct {
     Options map[string]*Option
 }
 
+// NewApp is a constructor of App struct
 func NewApp(name, version string) (*App, error) {
     
     app := &App {
@@ -41,6 +42,7 @@ func NewApp(name, version string) (*App, error) {
     
 }
 
+// GetCommandArgs is a function to get arguments of given command name
 func (a App) GetCommandArgs(name string) []string {
     if a.Commands[name] != nil {
         return a.Commands[name].GetArgs()
@@ -48,6 +50,7 @@ func (a App) GetCommandArgs(name string) []string {
     return []string{}
 }
 
+// GetOptionArgs is a function to get arguments of given option name
 func (a App) GetOptionArgs(name string) []string {
     if a.Options[name] != nil {
         return a.Options[name].GetArgs()
@@ -73,13 +76,20 @@ func (a *App) AddOption(name, synopsis string, argCount int) error {
 }
 
 // AddCommand is a function to add given command to App
-func (a *App) AddCommand(name, shortName, synopsis string, argCount int) bool {
+func (a *App) AddCommand(name, shortName, synopsis string, argCount int) error {
+
     if a.Commands[name] != nil {
-        fmt.Printf("%s command is duplicated.\n", name)
-        return false
+        return fmt.Errorf("%s command is duplicated", name)
     }
-    a.Commands[name] = NewCommand(name, shortName, synopsis, argCount)
-    return true
+
+    cmd, err := NewCommand(name, shortName, synopsis, argCount)
+    if err != nil {
+        return err
+    }
+
+    a.Commands[name] = cmd
+    return nil
+
 }
 
 // Help is a function to display help message
@@ -171,7 +181,7 @@ func (a *App) Parse(args []string) (int, error){
         fmt.Printf("%s %s\n", a.Name, a.Version)
         return 0, nil
     }
-    
+
     var i uint
     for i = 0; i < args_len; i++ {
         
@@ -190,8 +200,8 @@ func (a *App) Parse(args []string) (int, error){
                 }
             }
         } else if a.Commands[args[i]] != nil {
-            if exitStatus := a.Commands[args[i]].Parse(args[i:], &i); exitStatus != 0 {
-                return exitStatus, nil
+            if s, err := a.Commands[args[i]].Parse(args[i:], &i); err != nil {
+                return s, err
             }
         } else {
             a.Args = append(a.Args, args[i])
@@ -200,6 +210,7 @@ func (a *App) Parse(args []string) (int, error){
     }
     
     return 0, nil
+
 }
 
 // hasComand is a function to exist the Option

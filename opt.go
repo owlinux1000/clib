@@ -38,7 +38,7 @@ func (o *Option) Parse(args []string, i *uint) (int, error) {
     }
     
     if o.ArgCount > len(args) - 1 {
-        return 1, errors.New("Lack of argument")
+        return 1, errors.New("Argument count is invalid")
     }
 
     for _i := 1; _i < o.ArgCount + 1; _i++ {
@@ -47,7 +47,7 @@ func (o *Option) Parse(args []string, i *uint) (int, error) {
     }
 
     if len(o.args) != o.ArgCount {
-        return 1, errors.New("Lack of argument")
+        return 1, errors.New("Argument count is invalid")
     } else {
         return 0, nil
     }
