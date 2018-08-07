@@ -62,7 +62,7 @@ func (a App) GetOptionArgs(name string) []string {
 func (a *App) AddOption(name, synopsis string, argCount int) error {
     
     if a.Options[name] != nil {
-        return errors.New(fmt.Sprintf("-%s option duplicated.\n", name))
+        return fmt.Errorf("-%s option duplicated.\n", name)
     }
     
     opt, err := NewOption(name, synopsis, argCount)
@@ -188,9 +188,7 @@ func (a *App) Parse(args []string) (int, error){
         if strings.HasPrefix(args[i], "-") {
             
             if len(args[i]) != 2 {
-                return 1, errors.New(
-                    fmt.Sprintf("Invalid option format: %v", args[i]),
-                )
+                return 1, fmt.Errorf("Invalid option format: %v", args[i])
             }
             
             o := string(args[i][1])
