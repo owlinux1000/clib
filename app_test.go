@@ -93,7 +93,7 @@ func TestAppParseOneCommandOneOption(t *testing.T) {
 func TestHelp(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option]\n"
-    //expected += "\nOptions:\n\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
+    expected += "\nOptions:\n\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
     actual := app.Help()
     if actual != expected {
         t.Errorf("got: \n%v\nwant: \n%v", actual, expected)
@@ -103,6 +103,9 @@ func TestHelp(t *testing.T) {
 func TestHelp2(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option] [<args>]\n"
+    expected += "\nOptions:\n"
+    expected += "\t-a\t\ta option\n"
+    expected += "\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
     app.AddOption("a", "a option", 1)
     actual := app.Help()
     if actual != expected {
@@ -113,6 +116,9 @@ func TestHelp2(t *testing.T) {
 func TestHelp3(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option] [<args>...]\n"
+    expected += "\nOptions:\n"
+    expected += "\t-a ...\ta option\n"
+    expected += "\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
     app.AddOption("a", "a option", 2)
     actual := app.Help()
     if actual != expected {
@@ -123,6 +129,10 @@ func TestHelp3(t *testing.T) {
 func TestHelp4(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option]\n\ttestapp <command>\n"
+    expected += "\nOptions:\n"
+    expected += "\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
+    expected += "\nCommands:\n"
+    expected += "\tinstall\t\tInstall command\n"
     app.AddCommand("install", "i", "Install command", 0)
     actual := app.Help()
     if actual != expected {
@@ -133,6 +143,10 @@ func TestHelp4(t *testing.T) {
 func TestHelp5(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option]\n\ttestapp <command> <args>\n"
+    expected += "\nOptions:\n"
+    expected += "\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
+    expected += "\nCommands:\n"
+    expected += "\tinstall\t\tInstall command\n"
     app.AddCommand("install", "i", "Install command", 1)
     actual := app.Help()
     if actual != expected {
@@ -143,7 +157,13 @@ func TestHelp5(t *testing.T) {
 func TestHelp6(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option]\n\ttestapp <command> [<args>]\n"
+    expected += "\nOptions:\n"
+    expected += "\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
+    expected += "\nCommands:\n"
+    expected += "\tinstall\tFILE\tInstall command\n"
+    expected += "\tinstall2\t\tInstall2 command\n"
     app.AddCommand("install", "i", "Install command", 1)
+    app.Commands["install"].ArgName = "FILE"
     app.AddCommand("install2", "i2", "Install2 command", 0)
     actual := app.Help()
     if actual != expected {
@@ -154,8 +174,14 @@ func TestHelp6(t *testing.T) {
 func TestHelp7(t *testing.T) {
     app, _ := NewApp("testapp", "1.0.0")
     expected := "Usage: \n\ttestapp [option]\n\ttestapp <command> [<args>...]\n"
+    expected += "\nOptions:\n"
+    expected += "\t-h\t\tDisplay the usage message\n\t-v\t\tDisplay the my version\n"
+    expected += "\nCommands:\n"
+    expected += "\tinstall\tFILE ...\tInstall command\n"
+    expected += "\tinstall2\t\tInstall2 command\n"
     app.AddCommand("install", "i", "Install command", 2)
     app.AddCommand("install2", "i2", "Install2 command", 0)
+    app.Commands["install"].ArgName = "FILE"
     actual := app.Help()
     if actual != expected {
         t.Errorf("got: %v\nwant: %v", actual, expected)

@@ -2,6 +2,7 @@ package clib
 
 import (
     "fmt"
+    "sort"
     "strings"
 )
 
@@ -135,71 +136,53 @@ func (a *App) Help() (s string) {
             s += "\n"
         }
     }
-    /*
+    
+    keys := make([]string, 0, len(a.Options))
+    for k := range a.Options {
+        keys = append(keys, k)
+    }
+    sort.Strings(keys)
+
     s += "\nOptions:\n"
-    for _, o := range a.Options {
-        s += "\t-" + o.Name + " "
-        if o.ArgCount > 1 {
-            s += o.ArgName + " ...\t"
-        } else if o.ArgCount == 1 {
-            s += o.ArgName + "\t\t"
+    for _, k := range keys {
+        s += "\t-" + k
+        if a.Options[k].ArgCount > 1 {
+            s += a.Options[k].ArgName + " ...\t"
+        } else if a.Options[k].ArgCount == 1 {
+            s += a.Options[k].ArgName + "\t\t"
         } else {
             s += "\t\t"
         }
-        s += o.Synopsis + "\n"
+
+        s += a.Options[k].Synopsis + "\n"
+
     }
-*/
+
+    if len(a.Commands) == 0 {
+        return s
+    }
+
+    s += "\nCommands:\n"
+    keys = make([]string, 0, len(a.Commands))
+    for k := range a.Commands {
+        keys = append(keys, k)
+    }
+    sort.Strings(keys)
+    
+    for _, k := range keys {
+        s += "\t" + k + "\t"
+        if a.Commands[k].ArgCount > 1 {
+            s += a.Commands[k].ArgName + " ...\t"
+        } else if a.Commands[k].ArgCount == 1 {
+            s += a.Commands[k].ArgName + "\t"
+        } else {
+            s += "\t"
+        }
+        s += a.Commands[k].Synopsis + "\n"
+    }
+
     return s
 
-    /*
-    fmt.Printf("Usage: \n\t")
-    fmt.Printf("%s", a.Name)
-    if len(a.Options) != 0 {
-        fmt.Printf(" [option]")
-        if a.hasOptionArg() {
-            fmt.Println(" [<args>]")
-        } else {
-            fmt.Println()
-        }
-    }
-    
-    if len(a.Commands) != 0 {
-        fmt.Printf("\t%s <command>", a.Name)
-        if a.hasCommandArg() {
-            fmt.Println(" [<args>]")
-        } else {
-            fmt.Println()
-        }
-    }
-    fmt.Printf("\nOptions:\n\n")
-    for _, o := range a.Options {
-        fmt.Printf("\t-%s ", o.Name)
-        if o.ArgCount > 1 {
-            fmt.Printf("%s ...\t", o.ArgName)
-        } else if o.ArgCount == 1 {
-            fmt.Printf("%s\t\t", o.ArgName)
-        } else {
-            fmt.Printf("\t\t")
-        }
-        fmt.Printf("%s\n", o.Synopsis)
-    }
-
-    if len(a.Commands) != 0 {
-        fmt.Printf("\nCommands:\n\n")
-    }
-    
-    for _, c := range a.Commands {
-        fmt.Printf("\t%s\t", c.Name)
-        if c.ArgCount > 1 {
-            fmt.Printf("%s ...\t", c.ArgName)            
-        } else if c.ArgCount == 1 {
-            fmt.Printf("%s\t", c.ArgName)            
-        } else {
-            fmt.Printf("\t")
-        }
-        fmt.Printf("%s\n", c.Synopsis)
-    }
-*/
 }
 
 func (a App) haveOptionArg() (bool, int) {
