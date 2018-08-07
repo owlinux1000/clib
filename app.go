@@ -3,7 +3,6 @@ package clib
 import (
     "fmt"
     "strings"
-    "errors"
 )
 
 // App is a main struct of clib package.
@@ -12,6 +11,8 @@ type App struct {
     Name string
     // Application version
     Version string
+    // Synopsis
+    Synopsis string
     // Argument
     Args []string
     // all Commands
@@ -92,8 +93,65 @@ func (a *App) AddCommand(name, shortName, synopsis string, argCount int) error {
 
 }
 
+func (a *App) addSynopsis(i interface{}) {
+    switch i.(type) {
+    case Option:
+
+    case Command:
+
+    }
+}
+
 // Help is a function to display help message
-func (a App) Help() {
+func (a *App) Help() (s string) {
+
+    s = "Usage: \n\t" + a.Name
+    if len(a.Options) > 0 {
+        s += " [option]"
+        if have, count := a.haveOptionArg(); have {
+            if count > 1 {
+                s += " [<args>...]\n"
+            } else if count == 1 {
+                s += " [<args>]\n"
+            }
+        } else {
+            s += "\n"
+        }
+    }
+
+    if len(a.Commands) != 0 {
+        s += "\t" + a.Name
+        s += " <command>"
+        if have, count := a.haveCommandArg(); have {
+            f := a.haveCommandNoArg()
+            if count > 1 && f {
+                s += " [<args>...]\n"
+            } else if count == 1 && f {
+                s += " [<args>]\n"
+            } else if count == 1 {
+                s += " <args>\n"
+            }
+        } else {
+            s += "\n"
+        }
+    }
+    /*
+    s += "\nOptions:\n"
+    for _, o := range a.Options {
+        s += "\t-" + o.Name + " "
+        if o.ArgCount > 1 {
+            s += o.ArgName + " ...\t"
+        } else if o.ArgCount == 1 {
+            s += o.ArgName + "\t\t"
+        } else {
+            s += "\t\t"
+        }
+        s += o.Synopsis + "\n"
+    }
+*/
+    return s
+
+    /*
     fmt.Printf("Usage: \n\t")
     fmt.Printf("%s", a.Name)
     if len(a.Options) != 0 {
@@ -141,21 +199,40 @@ func (a App) Help() {
         }
         fmt.Printf("%s\n", c.Synopsis)
     }
+*/
 }
 
-func (a App) hasOptionArg() bool {
+func (a App) haveOptionArg() (bool, int) {
+    f := false
+    max_argc := 0
     for _, o := range a.Options {
         if o.ArgCount != 0 {
-            return true
+            f = true
+            if o.ArgCount > max_argc {
+                max_argc = o.ArgCount
+            }
         }
     }
-    return false
+    return f, max_argc
 }
 
-
-func (a App) hasCommandArg() bool {
+func (a App) haveCommandArg() (bool, int) {
+    f := false
+    max_argc := 0
     for _, c := range a.Commands {
         if c.ArgCount != 0 {
+            f = true
+            if c.ArgCount > max_argc {
+                max_argc = c.ArgCount
+            }
+        }
+    }
+    return f, max_argc
+}
+
+func (a App) haveCommandNoArg() bool {
+    for _, c := range a.Commands {
+        if c.ArgCount == 0 {
             return true
         }
     }
