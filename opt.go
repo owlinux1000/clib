@@ -7,14 +7,15 @@ type Option struct {
     Synopsis string
     ArgName string
     ArgCount int
-    SetFlag bool
+    setFlag bool
     args []string
 }
 
+// NewOption is a constructor of Option
 func NewOption(name, synopsis string, argCount int) (*Option, error) {
 
-    if len(name) != 1 {
-        return nil, errors.New("Option name must one letter.")
+    if len(name) != 2  || name[0] != '-' {
+        return nil, errors.New("Option name must following format: -v")
     }
     
     return &Option{
@@ -25,13 +26,20 @@ func NewOption(name, synopsis string, argCount int) (*Option, error) {
     
 }
 
-func (o Option) GetArgs() []string {
+// Args returns args of myself
+func (o Option) Args() []string {
     return o.args
 }
 
+// SetFlag returns setFlag of myself
+func (o Option) SetFlag() bool {
+    return o.setFlag
+}
+
+// Parse is a function to parse the argument
 func (o *Option) Parse(args []string, i *uint) (int, error) {
     
-    o.SetFlag = true
+    o.setFlag = true
     
     if o.ArgCount == 0 {
         return 0, nil

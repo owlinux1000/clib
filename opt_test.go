@@ -4,7 +4,7 @@ import "testing"
 
 func TestParseNoArgOption(t *testing.T) {
     
-    opt, _ := NewOption("a", "a option", 0)
+    opt, _ := NewOption("-a", "a option", 0)
     
     var i uint = 0
     args := []string{
@@ -18,8 +18,8 @@ func TestParseNoArgOption(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
-    if len(opt.GetArgs()) != 0 {
-        t.Errorf("got: %v\nwant: %v", len(opt.GetArgs()), 0)
+    if len(opt.Args()) != 0 {
+        t.Errorf("got: %v\nwant: %v", len(opt.Args()), 0)
     }
 
     if i != 0 {
@@ -30,7 +30,7 @@ func TestParseNoArgOption(t *testing.T) {
 
 func TestParseOneArgOption(t *testing.T) {
 
-    opt, _ := NewOption("a", "a option", 1)
+    opt, _ := NewOption("-a", "a option", 1)
     
     var i uint = 0
     args := []string{
@@ -44,8 +44,8 @@ func TestParseOneArgOption(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
-    if len(opt.GetArgs()) != 1 {
-        t.Errorf("got: %v\nwant: %v", len(opt.GetArgs()), 1)
+    if len(opt.Args()) != 1 {
+        t.Errorf("got: %v\nwant: %v", len(opt.Args()), 1)
     }
 
     if i != 1 {
@@ -56,7 +56,7 @@ func TestParseOneArgOption(t *testing.T) {
 
 func TestParseOneArgOption2(t *testing.T) {
     
-    opt, _ := NewOption("a", "a option", 1)
+    opt, _ := NewOption("-a", "a option", 1)
     
     var i uint = 0
     args := []string{
@@ -73,7 +73,7 @@ func TestParseOneArgOption2(t *testing.T) {
 
 func TestParseTwoArgOption(t *testing.T) {
 
-    opt, _ := NewOption("a", "a option", 2)
+    opt, _ := NewOption("-a", "a option", 2)
     
     var i uint = 0
     args := []string{
@@ -88,8 +88,8 @@ func TestParseTwoArgOption(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
-    if len(opt.GetArgs()) != 2 {
-        t.Errorf("got: %v\nwant: %v", len(opt.GetArgs()), 2)
+    if len(opt.Args()) != 2 {
+        t.Errorf("got: %v\nwant: %v", len(opt.Args()), 2)
     }
 
     if i != 2 {

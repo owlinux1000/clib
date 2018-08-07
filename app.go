@@ -3,10 +3,10 @@ package clib
 import (
     "fmt"
     "sort"
-    "strings"
+    _ "strings"
 )
 
-// App is a main struct of clib package.
+// App represents a command line application.
 type App struct {
     // Application name
     Name string
@@ -14,29 +14,30 @@ type App struct {
     Version string
     // Synopsis
     Synopsis string
-    // Argument
-    Args []string
     // all Commands
     Commands map[string]*Command
     // all Options
     Options map[string]*Option
+    // Argument
+    args []string
 }
 
-// NewApp is a constructor of App struct
-func NewApp(name, version string) (*App, error) {
+// NewApp is a constructor of App
+func NewApp(name, version, synopsis string) (*App, error) {
     
     app := &App {
         Name: name,
         Version: version,
+        Synopsis: synopsis,
         Commands: map[string]*Command{},
         Options: map[string]*Option{},
     }
     
-    if err := app.AddOption("h", "Display the usage message", 0); err != nil {
+    if err := app.AddOption("-h", "Display this message", 0); err != nil {
         return nil, err
     }
     
-    if err := app.AddOption("v", "Display the my version", 0); err != nil {
+    if err := app.AddOption("-v", "Print version info and exit", 0); err != nil {
         return nil, err
     }
     
@@ -44,27 +45,88 @@ func NewApp(name, version string) (*App, error) {
     
 }
 
-// GetCommandArgs is a function to get arguments of given command name
-func (a App) GetCommandArgs(name string) []string {
-    if a.Commands[name] != nil {
-        return a.Commands[name].GetArgs()
+// Parse is a function to parse the argument
+func (a *App) Parse(args []string) (int, error){
+    
+    argsLen := uint(len(args))
+    for i := uint(0); i < argsLen; i++ {
+        if a.Options[args[i]] != nil {
+            if s, err := a.Options[args[i]].Parse(args[i:], &i); err != nil {
+                return s, err
+            }
+        } else if a.Commands[args[i]] != nil {
+            if s, err := a.Commands[args[i]].Parse(args[i:], &i); err != nil {
+                return s, err
+            }
+        } else {
+            a.args = append(a.args, args[i])
+        }
+        
     }
-    return []string{}
+    
+    return 0, nil
+
 }
 
-// GetOptionArgs is a function to get arguments of given option name
-func (a App) GetOptionArgs(name string) []string {
-    if a.Options[name] != nil {
-        return a.Options[name].GetArgs()
+// Args returns argument of myself
+func (a App) Args() []string {
+    return a.args
+}
+
+// Command returns *Command
+func (a App) Command(name string) *Command {
+    if a.Commands[name] != nil {
+        return a.Commands[name]
     }
-    return []string{}
+    return nil
+}
+
+// Command returns *Option
+func (a App) Option(name string) *Option {
+    if a.Options[name] != nil {
+        return a.Options[name]
+    }
+    return nil
+}
+
+// CommandFlag returns whether the command was set
+func (a App) CommandFlag(name string) (bool, error) {
+    if cmd := a.Command(name); cmd != nil {
+        return cmd.SetFlag(), nil
+    }
+    return false, fmt.Errorf("No command: %s", name)
+}
+
+// CommandFlag returns whether the option was set
+func (a App) OptionFlag(name string) (bool, error) {
+    if opt := a.Option(name); opt != nil {
+        return opt.SetFlag(), nil
+    }
+    return false, fmt.Errorf("No option: %s", name)
+}
+
+
+// CommandArgs is a function to get arguments of given command name
+func (a App) CommandArgs(name string) ([]string, error) {
+    if cmd := a.Command(name); cmd != nil {
+        return cmd.Args(), nil
+    }
+    return []string{}, fmt.Errorf("No command: %s", name)
+}
+
+// OptionArgs is a function to get arguments of given option name
+func (a App) OptionArgs(name string) ([]string, error) {
+    if opt := a.Option(name); opt != nil {
+        return opt.Args(), nil
+    }
+    return []string{}, fmt.Errorf("No option: %s", name)
 }
 
 // AddOption is a function to add given option to App
 func (a *App) AddOption(name, synopsis string, argCount int) error {
     
     if a.Options[name] != nil {
-        return fmt.Errorf("-%s option duplicated.\n", name)
+        return fmt.Errorf("%s option duplicated.\n", name)
     }
     
     opt, err := NewOption(name, synopsis, argCount)
@@ -83,7 +145,7 @@ func (a *App) AddCommand(name, shortName, synopsis string, argCount int) error {
     if a.Commands[name] != nil {
         return fmt.Errorf("%s command is duplicated", name)
     }
-
+    
     cmd, err := NewCommand(name, shortName, synopsis, argCount)
     if err != nil {
         return err
@@ -94,19 +156,14 @@ func (a *App) AddCommand(name, shortName, synopsis string, argCount int) error {
 
 }
 
-func (a *App) addSynopsis(i interface{}) {
-    switch i.(type) {
-    case Option:
-
-    case Command:
-
-    }
-}
-
-// Help is a function to display help message
-func (a *App) Help() (s string) {
-
+// Usage returns the usage message created automatically
+func (a *App) Usage() (s string) {
+    
     s = "Usage: \n\t" + a.Name
+    if a.Synopsis != "" {
+        s = a.Synopsis + "\n\n" + s
+    }
+
     if len(a.Options) > 0 {
         s += " [option]"
         if have, count := a.haveOptionArg(); have {
@@ -145,7 +202,7 @@ func (a *App) Help() (s string) {
 
     s += "\nOptions:\n"
     for _, k := range keys {
-        s += "\t-" + k
+        s += "\t" + k
         if a.Options[k].ArgCount > 1 {
             s += a.Options[k].ArgName + " ...\t"
         } else if a.Options[k].ArgCount == 1 {
@@ -220,98 +277,4 @@ func (a App) haveCommandNoArg() bool {
         }
     }
     return false
-}
-
-// Parse is a function to parse the argument
-func (a *App) Parse(args []string) (int, error){
-    
-    args_len := uint(len(args))
-    
-    if args_len == 0 {
-        a.Help()
-        return 0, nil
-    }
-
-    if args[0] == "-h" {
-        a.Help()
-        return 0, nil
-    }
-
-    if args[0] == "-v" {
-        fmt.Printf("%s %s\n", a.Name, a.Version)
-        return 0, nil
-    }
-
-    var i uint
-    for i = 0; i < args_len; i++ {
-        
-        if strings.HasPrefix(args[i], "-") {
-            
-            if len(args[i]) != 2 {
-                return 1, fmt.Errorf("Invalid option format: %v", args[i])
-            }
-            
-            o := string(args[i][1])
-            if a.Options[o] != nil {
-                if s, err := a.Options[o].Parse(args[i:], &i); err != nil {
-                    return s, err
-                }
-            }
-        } else if a.Commands[args[i]] != nil {
-            if s, err := a.Commands[args[i]].Parse(args[i:], &i); err != nil {
-                return s, err
-            }
-        } else {
-            a.Args = append(a.Args, args[i])
-        }
-        
-    }
-    
-    return 0, nil
-
-}
-
-// hasComand is a function to exist the Option
-func (a App) hasOption(s string) bool {
-    for _, v := range a.Options {
-        if v.Name == s {
-            return true
-        }
-    }
-    return false
-}
-
-// hasComand is a function to exist the Command
-func (a App) hasCommand(s string) bool {
-    for _, v := range a.Commands {
-        if v.Name == s || v.ShortName == s {
-            return true
-        }
-    }
-    return false
-}
-
-// indexOfOption is a function to get the index of Option
-func (a App) indexOfOption(s string) (uint) {
-    
-    var i uint
-    for _, o := range a.Options {
-        if o.Name == s {
-            break
-        }
-        i += 1
-    }
-    return i
-}
-
-// indexOfOption is a function to get the index of Command
-func (a App) indexOfComand(s string) (uint) {
-    var i uint
-    for _, c := range a.Commands {
-        if c.Name == s || c.ShortName == s {
-            break
-        }
-        i += 1
-    }
-    return i
 }

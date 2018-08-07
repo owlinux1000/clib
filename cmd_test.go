@@ -20,12 +20,12 @@ func TestParseNoArgCommand(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
 
-    if len(cmd.GetArgs()) != 0 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 0)
+    if len(cmd.Args()) != 0 {
+        t.Errorf("got: %v\nwant: %v", len(cmd.Args()), 0)
     }
 
     if i != 0 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 0)
+        t.Errorf("got: %v\nwant: %v", len(cmd.Args()), 0)
     }
     
 }
@@ -47,12 +47,12 @@ func TestParseOneArgCommand(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
-    if len(cmd.GetArgs()) != 1 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 1)
+    if len(cmd.Args()) != 1 {
+        t.Errorf("got: %v\nwant: %v", len(cmd.Args()), 1)
     }
     
-    if cmd.GetArgs()[0] != "hoge" {
-        t.Errorf("got: %v\nwant: %v", cmd.GetArgs(), []string{"hoge"})
+    if cmd.Args()[0] != "hoge" {
+        t.Errorf("got: %v\nwant: %v", cmd.Args(), []string{"hoge"})
     }
     
     if i != 1 {
@@ -96,12 +96,12 @@ func TestParseTwoArgCommand(t *testing.T) {
         t.Errorf("got: %v\nwant: %v", actual, expected)
     }
     
-    if cmd.GetArgs()[0] != "hoge" || cmd.GetArgs()[1] != "fuga" {
-        t.Errorf("got: %v\nwant: %v", cmd.GetArgs(), []string{"hoge", "fuga"})
+    if cmd.Args()[0] != "hoge" || cmd.Args()[1] != "fuga" {
+        t.Errorf("got: %v\nwant: %v", cmd.Args(), []string{"hoge", "fuga"})
     }
     
-    if len(cmd.GetArgs()) != 2 {
-        t.Errorf("got: %v\nwant: %v", len(cmd.GetArgs()), 2)
+    if len(cmd.Args()) != 2 {
+        t.Errorf("got: %v\nwant: %v", len(cmd.Args()), 2)
     }
 
     if i != 2 {

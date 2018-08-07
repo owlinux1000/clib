@@ -8,7 +8,7 @@ type Command struct {
     Synopsis string
     ArgName string
     ArgCount int
-    SetFlag bool
+    setFlag bool
     args []string
 }
 
@@ -24,13 +24,20 @@ func NewCommand(name, shortName, synopsis string, argCount int) (*Command, error
 
 }
 
-func (c Command) GetArgs() []string {
+// Args returns args of myself
+func (c Command) Args() []string {
     return c.args
 }
 
+// SetFlag returns setFlag of myself
+func (c Command) SetFlag() bool {
+    return c.setFlag
+}
+
+// Parse is a function to parse the argument
 func (c *Command) Parse(args []string, i *uint) (int, error) {
     
-    c.SetFlag = true
+    c.setFlag = true
     
     if c.ArgCount == 0 {
         return 0, nil
