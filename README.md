@@ -45,7 +45,7 @@ func main() {
         os.Exit(0)
     }
     
-    exitStatus, err := app.Parse(os.Args[1:])
+    exitStatus, err := app.Parse(os.Args)
     if err != nil {
         panic(err)
     }
