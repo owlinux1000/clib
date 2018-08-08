@@ -40,12 +40,8 @@ func main() {
     if err := app.AddOption("-u", "update tracked files", 0); err != nil {
         panic(err)
     }
-
-    if len(os.Args) == 0 {
-        os.Exit(0)
-    }
     
-    exitStatus, err := app.Parse(os.Args[1:])
+    exitStatus, err := app.Parse(os.Args)
     if err != nil {
         panic(err)
     }
