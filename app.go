@@ -18,6 +18,8 @@ type App struct {
     Commands map[string]*Command
     // all Options
     Options map[string]*Option
+    // NoArgUsageFlag represents whether or not to call Usage when executed without argument
+    NoArgUsageFlag bool
     // Argument
     args []string
 }
@@ -47,7 +49,16 @@ func NewApp(name, version, synopsis string) (*App, error) {
 
 // Parse is a function to parse the argument
 func (a *App) Parse(args []string) (int, error){
-    
+
+    if len(args) == 1 {
+        if a.NoArgUsageFlag {
+            fmt.Printf(a.Usage())
+            return 0, nil
+        } else {
+            return 0, nil
+        }
+    }
+    args = args[1:]
     argsLen := uint(len(args))
     for i := uint(0); i < argsLen; i++ {
         if a.Options[args[i]] != nil {
