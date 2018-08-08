@@ -2,17 +2,25 @@ package clib
 
 import "errors"
 
+// Command represents a subcommand
 type Command struct {
+    // Command name
     Name string
+    // Command short name
     ShortName string
+    // To be used Usage function
     Synopsis string
+    // To be used argument name
     ArgName string
+    // Expected argument count
     ArgCount int
+    // setFlag represents whether this command was set
     setFlag bool
+    // args represents argument of myself
     args []string
 }
 
-// NewCommand is a constructor of Command struct
+// NewCommand is a constructor of Command
 func NewCommand(name, shortName, synopsis string, argCount int) (*Command, error) {
 
     return &Command{

@@ -2,12 +2,19 @@ package clib
 
 import "errors"
 
+// Option represents a option
 type Option struct {
+    // Option name such as -h
     Name string
+    // To be used Usage function
     Synopsis string
+    // To be used argument name
     ArgName string
+    // Expected argument count    
     ArgCount int
+    // setFlag represents whether this command was set    
     setFlag bool
+    // args represents argument of myself
     args []string
 }
 

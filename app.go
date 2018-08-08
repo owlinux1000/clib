@@ -3,7 +3,6 @@ package clib
 import (
     "fmt"
     "sort"
-    _ "strings"
 )
 
 // App represents a command line application.
@@ -14,9 +13,9 @@ type App struct {
     Version string
     // Synopsis
     Synopsis string
-    // all Commands
+    // Commands represents added Command
     Commands map[string]*Command
-    // all Options
+    // Options represents added Option
     Options map[string]*Option
     // NoArgUsageFlag represents whether or not to call Usage when executed without argument
     NoArgUsageFlag bool
@@ -58,6 +57,7 @@ func (a *App) Parse(args []string) (int, error){
             return 0, nil
         }
     }
+    
     args = args[1:]
     argsLen := uint(len(args))
     for i := uint(0); i < argsLen; i++ {
@@ -115,7 +115,6 @@ func (a App) OptionFlag(name string) (bool, error) {
     }
     return false, fmt.Errorf("No option: %s", name)
 }
-
 
 // CommandArgs is a function to get arguments of given command name
 func (a App) CommandArgs(name string) ([]string, error) {
