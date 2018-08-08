@@ -60,3 +60,23 @@ func main() {
     
 }
 ```
+
+The result executed `go run` is here.
+
+```
+$ mygit
+
+A toy git client
+
+Usage: 
+	mygit [option]
+	mygit <command>
+
+Options:
+	-h		Display this message
+	-u		update tracked files
+	-v		Print version info and exit
+
+Commands:
+	add		Add file contents to the index
+```
