@@ -12,7 +12,7 @@ func TestAppParseWithNoArgCommand(t *testing.T) {
         "hoge",
     }
     
-    actual, _ := app.Parse(args[1:])
+    actual, _ := app.Parse(args)
     expected := 0
     
     if actual != expected {
@@ -36,7 +36,7 @@ func TestAppParseWithOneArgCommand(t *testing.T) {
         "hoge",
     }
     
-    actual, _ := app.Parse(args[1:])
+    actual, _ := app.Parse(args)
     expected := 0
     
     if actual != expected {
@@ -66,7 +66,7 @@ func TestAppParseOneCommandOneOption(t *testing.T) {
         "huge",
     }
     
-    actual, _ := app.Parse(args[1:])
+    actual, _ := app.Parse(args)
     expected := 0
     
     if actual != expected {
