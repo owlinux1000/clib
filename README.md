@@ -17,7 +17,7 @@ $ go get github.com/owlinux1000/clib
 
 Here is a sample implemented like ```git add -u``` .
 
-```
+```go
 package main
 
 import (
