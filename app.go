@@ -216,7 +216,7 @@ func (a *App) Usage() (s string) {
         if a.Options[k].ArgCount > 1 {
             s += a.Options[k].ArgName + " ...\t"
         } else if a.Options[k].ArgCount == 1 {
-            s += a.Options[k].ArgName + "\t\t"
+            s += "\t" + a.Options[k].ArgName + "\t"
         } else {
             s += "\t\t"
         }
@@ -241,7 +241,7 @@ func (a *App) Usage() (s string) {
         if a.Commands[k].ArgCount > 1 {
             s += a.Commands[k].ArgName + " ...\t"
         } else if a.Commands[k].ArgCount == 1 {
-            s += a.Commands[k].ArgName + "\t"
+            s += "\t" + a.Commands[k].ArgName + "\t"
         } else {
             s += "\t"
         }
