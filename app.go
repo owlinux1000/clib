@@ -237,13 +237,18 @@ func (a *App) Usage() (s string) {
     sort.Strings(keys)
     
     for _, k := range keys {
-        s += "\t" + k + "\t"
+        s += "\t" + k
         if a.Commands[k].ArgCount > 1 {
-            s += a.Commands[k].ArgName + " ...\t"
+            s += "\t" + a.Commands[k].ArgName + " ...\t"
         } else if a.Commands[k].ArgCount == 1 {
-            s += "\t" + a.Commands[k].ArgName + "\t"
+            if a.Commands[k].ArgName == "" {
+                s += "\t" + a.Commands[k].ArgName + "\t"    
+            } else {
+                s += "\t\t" + a.Commands[k].ArgName + "\t"
+            }
+            
         } else {
-            s += "\t"
+            s += "\t\t"
         }
         s += a.Commands[k].Synopsis + "\n"
     }

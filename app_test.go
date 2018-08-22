@@ -160,7 +160,7 @@ func TestHelp6(t *testing.T) {
     expected += "\nOptions:\n"
     expected += "\t-h\t\tDisplay this message\n\t-v\t\tPrint version info and exit\n"
     expected += "\nCommands:\n"
-    expected += "\tinstall\tFILE\tInstall command\n"
+    expected += "\tinstall\t\tFILE\tInstall command\n"
     expected += "\tinstall2\t\tInstall2 command\n"
     app.AddCommand("install", "i", "Install command", 1)
     app.Commands["install"].ArgName = "FILE"
